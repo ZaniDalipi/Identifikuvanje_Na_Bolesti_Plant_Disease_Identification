@@ -1,0 +1,12 @@
+apple apple scab(Чадлива краставост)
+apple black rot(Црн рак кај јаболката)
+apple cedar apple rust(Рѓа на јаболката)
+apple healthy(здрав лист)
+cherry including sour powdery mildew
+cherry including sour healthy
+grape black rot
+grape esca black measles 
+grape leaf blight isariopsis leaf spot 
+grape healthy
+peach bacterial spot
+peach healthy
