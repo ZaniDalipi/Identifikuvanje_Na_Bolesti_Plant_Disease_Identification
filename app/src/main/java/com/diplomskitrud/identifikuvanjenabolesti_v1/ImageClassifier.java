@@ -5,7 +5,7 @@ import android.content.res.AssetFileDescriptor;
 import android.graphics.Bitmap;
 import android.os.SystemClock;
 import android.util.Log;
-import android.widget.Toast;
+
 
 import org.tensorflow.lite.Interpreter;
 
@@ -21,7 +21,6 @@ import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.PriorityQueue;
 
@@ -58,17 +57,15 @@ public class ImageClassifier {
 
     private float[][] filterLabelProbArray = null;
     private static final int FILTER_STAGES = 3;
-    private static final float FILTER_FACTOR = 0.4f;
+    private static final float FILTER_FACTOR = 0.5f; // the speed of the prediction
 
+    //unbound priority queuee based on priority heap , the implementation is not synchronizied we have to look out for multiple threads goin on same time
     private PriorityQueue<Map.Entry<String, Float>> sortedLabels =
             new PriorityQueue<>(
-                    RESULTS_TO_SHOW,
-                    new Comparator<Map.Entry<String, Float>>() {
-                        @Override
-                        public int compare(Map.Entry<String, Float> o1, Map.Entry<String, Float> o2) {
-                            return (o1.getValue()).compareTo(o2.getValue());
-                        }
-                    });
+                    RESULTS_TO_SHOW, // the initialCapacity
+
+                    // next we setup a comparator that will used to order this priority queue
+                    (o1, o2) -> (o1.getValue()).compareTo(o2.getValue()));
 
     /** Initializes an {@code ImageClassifier}. */
     ImageClassifier(Activity activity) throws IOException {
@@ -79,7 +76,7 @@ public class ImageClassifier {
                         4 * DIM_BATCH_SIZE * DIM_IMG_SIZE_X * DIM_IMG_SIZE_Y * DIM_PIXEL_SIZE);
         imgData.order(ByteOrder.nativeOrder());
         labelProbArray = new float[1][labelList.size()];
-        filterLabelProbArray = new float[FILTER_STAGES][labelList.size()];
+        filterLabelProbArray = new float[FILTER_STAGES][labelList.size()];//creating 2 arrays the one has the probability that has to filter later and the other labellist has all the list of labels
         Log.d(TAG, "Created a Tensorflow Lite Image Classifier.");
     }
 
@@ -150,12 +147,14 @@ public class ImageClassifier {
 
     /** Memory-map the model file in Assets. */
     private MappedByteBuffer loadModelFile(Activity activity) throws IOException {
-        AssetFileDescriptor fileDescriptor = activity.getAssets().openFd(MODEL_PATH);
-        FileInputStream inputStream = new FileInputStream(fileDescriptor.getFileDescriptor());
-        FileChannel fileChannel = inputStream.getChannel();
+        AssetFileDescriptor fileDescriptor = activity.getAssets().openFd(MODEL_PATH);// get the model path and this is used to read data
+        FileInputStream inputStream = new FileInputStream(fileDescriptor.getFileDescriptor()); // creating a inputStream to get the fileDescriptor and read the data
+        FileChannel fileChannel = inputStream.getChannel();// than we find the chanel of the inputstream , it can be used to read , write , map ,manipulate a file
+        // needed variables of time long that get the starting point of the file  , and the length of that file
         long startOffset = fileDescriptor.getStartOffset();
         long declaredLength = fileDescriptor.getDeclaredLength();
-        return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength);
+        // we map a region into the memory and we set the map model to Read_only cuz we dont want to write into it and the 2 variables that we created
+        return fileChannel.map(FileChannel.MapMode.READ_ONLY , startOffset , declaredLength);
     }
 
     /** Writes Image data into a {@code ByteBuffer}. */
@@ -163,20 +162,23 @@ public class ImageClassifier {
         if (imgData == null) {
             return;
         }
-        imgData.rewind();
-        bitmap.getPixels(intValues, 0, bitmap.getWidth(), 0, 0, bitmap.getWidth(), bitmap.getHeight());
+        imgData.rewind();// this re-reads a buffer reads the data that is contains , everything remains the same and it sets the pos to 0
+        // returns in the array a copy of the data in the bitmap with the values packaed int represented a color , stride num of entries to skip
+        //x y from where to start cordinates.
+        bitmap.getPixels(intValues, 0,bitmap.getWidth() , 0, 0, bitmap.getWidth(), bitmap.getHeight());
         // Convert the image to floating point.
         int pixel = 0;
-        long startTime = SystemClock.uptimeMillis();
+        long startTime = SystemClock.uptimeMillis(); // to measure the start time since boot or start time since reading the bytes and putting it
         for (int i = 0; i < DIM_IMG_SIZE_X; ++i) {
             for (int j = 0; j < DIM_IMG_SIZE_Y; ++j) {
                 final int val = intValues[pixel++];
                 imgData.putFloat((((val >> 16) & 0xFF)-IMAGE_MEAN)/IMAGE_STD);
                 imgData.putFloat((((val >> 8) & 0xFF)-IMAGE_MEAN)/IMAGE_STD);
                 imgData.putFloat((((val) & 0xFF)-IMAGE_MEAN)/IMAGE_STD);
+
             }
         }
-        long endTime = SystemClock.uptimeMillis();
+        long endTime = SystemClock.uptimeMillis(); // end time
         Log.d(TAG, "Timecost to put values into ByteBuffer: " + Long.toString(endTime - startTime));
     }
 
@@ -184,6 +186,7 @@ public class ImageClassifier {
     private String printTopKLabels() {
         for (int i = 0; i < labelList.size(); ++i) {
             sortedLabels.add(
+                    // creating an AbstractMap so we get only the skeleton of the Map Interfece so it can be running faster than Map interface , SimpleEntry () we can build costom maps
                     new AbstractMap.SimpleEntry<>(labelList.get(i), labelProbArray[0][i]));
             if (sortedLabels.size() > RESULTS_TO_SHOW) {
                 sortedLabels.poll();
@@ -192,7 +195,7 @@ public class ImageClassifier {
         String textToShow = "";
         final int size = sortedLabels.size();
         for (int i = 0; i < size; ++i) {
-            Map.Entry<String, Float> label = sortedLabels.poll();
+            Map.Entry<String, Float> label = sortedLabels.poll();// we assing the sortedLabels Map to labels Map
             textToShow = String.format("\n%s: %4.2f" , label.getKey(),label.getValue()) + textToShow;
         }
         return textToShow;
