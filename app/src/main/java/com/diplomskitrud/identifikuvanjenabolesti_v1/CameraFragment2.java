@@ -62,7 +62,7 @@ import java.util.concurrent.TimeUnit;
 public class CameraFragment2 extends Fragment  implements ActivityCompat.OnRequestPermissionsResultCallback {
 
     //some constants
-    private static final String TAG = "PlanDiseaseapp";
+    private static final String TAG = "PlanDiseaseApp";
     private static final String FRAGMENT_DIALOG = "dialog";
     private static final String HANDLE_THREAD_NAME = "CameraBackground";
     /** Max preview width that is guaranteed by Camera2 API */
