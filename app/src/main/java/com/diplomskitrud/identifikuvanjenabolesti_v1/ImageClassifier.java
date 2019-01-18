@@ -19,7 +19,6 @@ import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.AbstractMap;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
@@ -71,10 +70,11 @@ public class ImageClassifier {
     ImageClassifier(Activity activity) throws IOException {
         tflite = new Interpreter(loadModelFile(activity));
         labelList = loadLabelList(activity);
+        // allocate a to the variable or to a bytebuffer directly there is start and the limit or the capacity in the parameters
         imgData =
                 ByteBuffer.allocateDirect(
                         4 * DIM_BATCH_SIZE * DIM_IMG_SIZE_X * DIM_IMG_SIZE_Y * DIM_PIXEL_SIZE);
-        imgData.order(ByteOrder.nativeOrder());
+        imgData.order(ByteOrder.nativeOrder());// retrieves this buffers byte order
         labelProbArray = new float[1][labelList.size()];
         filterLabelProbArray = new float[FILTER_STAGES][labelList.size()];//creating 2 arrays the one has the probability that has to filter later and the other labellist has all the list of labels
         Log.d(TAG, "Created a Tensorflow Lite Image Classifier.");
@@ -197,6 +197,9 @@ public class ImageClassifier {
         for (int i = 0; i < size; ++i) {
             Map.Entry<String, Float> label = sortedLabels.poll();// we assing the sortedLabels Map to labels Map
             textToShow = String.format("\n%s: %4.2f" , label.getKey(),label.getValue()) + textToShow;
+
+            Log.d("head value" , label.getKey());
+            Log.d("head value" , label.getValue().toString());
         }
         return textToShow;
     }
