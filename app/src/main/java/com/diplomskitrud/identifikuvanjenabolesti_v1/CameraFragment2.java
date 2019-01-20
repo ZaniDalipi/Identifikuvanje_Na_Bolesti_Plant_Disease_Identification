@@ -302,7 +302,7 @@ public class CameraFragment2 extends Fragment  implements ActivityCompat.OnReque
                     rotatedPreviewHeight = height;
                     rotatedPreviewWidth = displaySize.x;
                     rotatedPreviewHeight = displaySize.y;
-                    mTextureView.setRotation(270);
+
                 }
 
                 if (maxPreviewWidth > MAX_PREVIEW_WIDTH) {

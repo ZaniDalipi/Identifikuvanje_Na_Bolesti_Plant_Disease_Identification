@@ -201,6 +201,7 @@ public class ImageClassifier {
             Log.d("head value" , label.getKey());
             Log.d("head value" , label.getValue().toString());
         }
+
         return textToShow;
     }
 }
