@@ -8,7 +8,6 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
@@ -28,17 +27,19 @@ import android.hardware.camera2.CaptureResult;
 import android.hardware.camera2.TotalCaptureResult;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.ImageReader;
-import android.os.Binder;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
+
 import android.app.Fragment;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.util.Size;
 import android.view.LayoutInflater;
@@ -211,8 +212,6 @@ public class CameraFragment2 extends Fragment  implements ActivityCompat.OnReque
             Log.e(TAG, "Failed to initialize an image classifier.");
         }
         startBackgroundThread();
-
-
     }
 
     /** this method will be useful to check if the texture is avaliable when we start the app or when we resume and i though will be the best place to check**/
@@ -420,7 +419,7 @@ public class CameraFragment2 extends Fragment  implements ActivityCompat.OnReque
                             if(null == mCameraDevice) {
                                 return;
                             }
-                            // this is executed when the session is ready and we start displaing the preview
+                            // this is executed when the session is ready and we start displaying the preview
                             captureSession = session;
 
 
@@ -493,6 +492,7 @@ public class CameraFragment2 extends Fragment  implements ActivityCompat.OnReque
         mBackgroundThread = new HandlerThread(HANDLE_THREAD_NAME);
         mBackgroundThread.start();
         mBackgroundHandler = new Handler(mBackgroundThread.getLooper());
+        // start the classification train & load an initial model
         synchronized (lock){
             runClassifier = true;
         }
@@ -512,7 +512,7 @@ public class CameraFragment2 extends Fragment  implements ActivityCompat.OnReque
             e.printStackTrace();
         }
     }
-    //TAKES PHOTOS AND CLASSIFY THEM PERIDOCALLY
+    //TAKES PHOTOS AND CLASSIFY THEM PERIDIOCALLY
     private Runnable periodicClassify =
             new Runnable() {
                 @Override
@@ -561,6 +561,7 @@ public class CameraFragment2 extends Fragment  implements ActivityCompat.OnReque
 
         // creating a arraylist that will holt the supported resoulutions that are at least as big as the surface or texture vie resolution
         List<Size> bigEnough = new ArrayList<>();
+
         // next we are creating a arraylist that will hold the surface that are smaller that the previous surface
         List<Size> notBigEnogh = new ArrayList<>();
         int w = aspectRation.getWidth();

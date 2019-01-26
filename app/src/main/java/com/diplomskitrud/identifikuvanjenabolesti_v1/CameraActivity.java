@@ -1,8 +1,7 @@
 package com.diplomskitrud.identifikuvanjenabolesti_v1;
 
-import android.Manifest;
 import android.app.Activity;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 
 

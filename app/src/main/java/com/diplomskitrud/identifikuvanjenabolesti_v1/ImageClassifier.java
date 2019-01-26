@@ -47,7 +47,7 @@ public class ImageClassifier {
     private int[] intValues = new int[DIM_IMG_SIZE_X * DIM_IMG_SIZE_Y];
 
     //INSTANCES(OBJ)
-    private Interpreter tflite; // OBJ OF INTERPRETER TO RUN THE MODEL INFERENCE VIA TENSOR FLOW
+    private Interpreter tflite; // OBJ OF INTERPRETER TO RUN THE MODEL INFERENCE VIA TENSORFLOW
     private List<String> labelList;//OUTPUT OF THE LABELS CORRESPONDING TO THE MODEL
     private ByteBuffer imgData = null; // THIS WILL HOLD THE IMAGEDATA THAT WILL BE FEED INTO TENSORFLOW LITE AS INPUT
 
@@ -102,7 +102,7 @@ public class ImageClassifier {
         return textToShow;
     }
 
-    void applyFilter(){
+   private void applyFilter(){
         int num_labels =  labelList.size();
 
         // Low pass filter `labelProbArray` into the first stage of the filter.
