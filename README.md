@@ -1,5 +1,5 @@
-# Plant-Disease-Identification__Identifikuvanje-Na-Bolesti-kaj-rastenijata
+# Plant Disease Identification - Identifikuvanje Na Bolesti kaj rastenijata
 
-Android app that i created for my final year project for "Faculty of Information and Communication technologies St. Kliment Ohridski University - Bitola"
+Android app that i created for my final year project for **"Faculty of Information and Communication technologies St. Kliment Ohridski University - Bitola"**
 
 
