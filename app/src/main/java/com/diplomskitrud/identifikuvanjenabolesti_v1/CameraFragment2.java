@@ -1,12 +1,12 @@
 package com.diplomskitrud.identifikuvanjenabolesti_v1;
 
 
-import android.Manifest;
-import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.Manifest;
+import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -62,13 +62,13 @@ import java.util.concurrent.TimeUnit;
 
 public class CameraFragment2 extends Fragment  implements ActivityCompat.OnRequestPermissionsResultCallback {
 
-    //some constants
+    //constants
+    //private static final String FRAGMENT_DIALOG = "dialog";
     private static final String TAG = "PlanDiseaseApp";
-    private static final String FRAGMENT_DIALOG = "dialog";
     private static final String HANDLE_THREAD_NAME = "CameraBackground";
-    /** Max preview width that is guaranteed by Camera2 API */
+    /* Max preview width that is guaranteed by Camera2 API */
     private static final int MAX_PREVIEW_WIDTH = 1920;
-    /** Max preview height that is guaranteed by Camera2 API */
+    /* Max preview height that is guaranteed by Camera2 API */
     private static final int MAX_PREVIEW_HEIGHT = 1080;
     private static final String CAMERA_PERMISSION = Manifest.permission.CAMERA;
     private static final int REQUEST_CODE = 0;
@@ -83,6 +83,7 @@ public class CameraFragment2 extends Fragment  implements ActivityCompat.OnReque
     /** variable that will hold the id of the camera  **/
     private boolean checkedPermissions = false;
 
+    // we use this final lock object to synchronize classes that may interact with untrusted code
     private final Object lock = new Object();
     private boolean runClassifier = false;
     private ImageClassifier imageClassifier;
@@ -220,7 +221,7 @@ public class CameraFragment2 extends Fragment  implements ActivityCompat.OnReque
         super.onResume();
         startBackgroundThread();
         if (mTextureView.isAvailable()) {
-            openCamera(mTextureView.getWidth(), mTextureView.getHeight());/** we are setuping it here like this cuz e know that the app has created it once here we resume**/
+            openCamera(mTextureView.getWidth(), mTextureView.getHeight());/* we are setuping it here like this cuz e know that the app has created it once here we resume**/
         } else {
             mTextureView.setSurfaceTextureListener(mSurfaceListener);
         }
@@ -336,8 +337,12 @@ public class CameraFragment2 extends Fragment  implements ActivityCompat.OnReque
         } catch (NullPointerException e) {
             // Currently an NPE is thrown when the Camera2API is used but not supported on the
             // device this code runs.
-            ErrorDialog.newInstance(getString(R.string.camera_error))
-                    .show(getChildFragmentManager(), FRAGMENT_DIALOG);
+
+
+            /**Commented this line cuz not needed */
+            /*
+            ErrorDialog.newInstance(getString(R.string.camera_error)).show(getChildFragmentManager(), FRAGMENT_DIALOG);
+             */
         }
     }
     private String[] getRequiredPermissions(){
@@ -493,6 +498,7 @@ public class CameraFragment2 extends Fragment  implements ActivityCompat.OnReque
         mBackgroundThread.start();
         mBackgroundHandler = new Handler(mBackgroundThread.getLooper());
         // start the classification train & load an initial model
+        // and with the synchronized we make sure that 2 threads cannon execute the same method at the same time
         synchronized (lock){
             runClassifier = true;
         }
@@ -512,7 +518,7 @@ public class CameraFragment2 extends Fragment  implements ActivityCompat.OnReque
             e.printStackTrace();
         }
     }
-    //TAKES PHOTOS AND CLASSIFY THEM PERIDIOCALLY
+    //Takes photos and classify them periodically
     private Runnable periodicClassify =
             new Runnable() {
                 @Override
@@ -609,6 +615,8 @@ public class CameraFragment2 extends Fragment  implements ActivityCompat.OnReque
         showToast(textToShow);
     }
 
+    /**Commented this line cuz not needed */
+    /*
     public static class ErrorDialog extends DialogFragment {
 
         private static final String ARG_MESSAGE = "message";
@@ -632,5 +640,5 @@ public class CameraFragment2 extends Fragment  implements ActivityCompat.OnReque
                     .create();
         }
 
-    }
+    }*/
 }

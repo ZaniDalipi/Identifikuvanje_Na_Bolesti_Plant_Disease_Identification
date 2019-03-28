@@ -43,20 +43,24 @@ public class ImageClassifier {
     private static final int IMAGE_MEAN = 128;
     private static final float IMAGE_STD = 128.0f;
 
-    //PRELOCATED BUFFERS FOR STORING IMAGE DATA IN
+    //Preallocated buffers for storing image data in
     private int[] intValues = new int[DIM_IMG_SIZE_X * DIM_IMG_SIZE_Y];
 
-    //INSTANCES(OBJ)
-    private Interpreter tflite; // OBJ OF INTERPRETER TO RUN THE MODEL INFERENCE VIA TENSORFLOW
-    private List<String> labelList;//OUTPUT OF THE LABELS CORRESPONDING TO THE MODEL
-    private ByteBuffer imgData = null; // THIS WILL HOLD THE IMAGEDATA THAT WILL BE FEED INTO TENSORFLOW LITE AS INPUT
+    //INSTANCES
+
+    private MappedByteBuffer tfliteModel; //The loaded TensorFlow Lite model.
+    private Interpreter tflite; // An instance of the driver class to run model inference with Tensorflow Lite
+    private List<String> labelList;//output of the labels corresponding to the model
+    private ByteBuffer imgData = null; // A ByteBuffer to hold image data, to be feed into Tensorflow Lite as inputs.
 
     //array that hold the inference result to be feed into tensorflow lite as output
     private float[][] labelProbArray = null;
 
+
     private float[][] filterLabelProbArray = null;
     private static final int FILTER_STAGES = 3;
-    private static final float FILTER_FACTOR = 0.5f; // the speed of the prediction
+    private static final float FILTER_FACTOR = 0.4f; // the speed of the prediction
+
 
     //unbound priority queuee based on priority heap , the implementation is not synchronizied we have to look out for multiple threads goin on same time
     private PriorityQueue<Map.Entry<String, Float>> sortedLabels =
@@ -68,16 +72,20 @@ public class ImageClassifier {
 
     /** Initializes an {@code ImageClassifier}. */
     ImageClassifier(Activity activity) throws IOException {
-        tflite = new Interpreter(loadModelFile(activity));
+        tfliteModel = loadModelFile(activity);
+        tflite = new Interpreter(tfliteModel);
         labelList = loadLabelList(activity);
         // allocate a to the variable or to a bytebuffer directly there is start and the limit or the capacity in the parameters
         imgData =
                 ByteBuffer.allocateDirect(
-                        4 * DIM_BATCH_SIZE * DIM_IMG_SIZE_X * DIM_IMG_SIZE_Y * DIM_PIXEL_SIZE);
+                        4 * DIM_BATCH_SIZE *
+                                DIM_IMG_SIZE_X *
+                                    DIM_IMG_SIZE_Y
+                                        * DIM_PIXEL_SIZE);
         imgData.order(ByteOrder.nativeOrder());// retrieves this buffers byte order
         labelProbArray = new float[1][labelList.size()];
         filterLabelProbArray = new float[FILTER_STAGES][labelList.size()];//creating 2 arrays the one has the probability that has to filter later and the other labellist has all the list of labels
-        Log.d(TAG, "Created a Tensorflow Lite Image Classifier.");
+        Log.d(TAG, "👌👌👌 Created a Tensorflow Lite Image Classifier.");
     }
 
     /** Classifies a frame from the preview stream. */
@@ -89,9 +97,11 @@ public class ImageClassifier {
         convertBitmapToByteBuffer(bitmap);
         // Here's where the magic happens!!!
         long startTime = SystemClock.uptimeMillis();
+
         tflite.run(imgData, labelProbArray);
+
         long endTime = SystemClock.uptimeMillis();
-        Log.d(TAG, "Timecost to run model inference: " + Long.toString(endTime - startTime));
+        Log.d(TAG, "🍎🍎🍎 Time cost to run model inference(Prediction) ms: " + Long.toString(endTime - startTime));
 
         // smooth the results
         applyFilter();
@@ -116,10 +126,8 @@ public class ImageClassifier {
                 filterLabelProbArray[i][j] += FILTER_FACTOR*(
                         filterLabelProbArray[i-1][j] -
                                 filterLabelProbArray[i][j]);
-
             }
         }
-
         // Copy the last stage filter output back to `labelProbArray`.
         for(int j=0; j<num_labels; ++j){
             labelProbArray[0][j] = filterLabelProbArray[FILTER_STAGES-1][j];
@@ -130,6 +138,7 @@ public class ImageClassifier {
     public void close() {
         tflite.close();
         tflite = null;
+        tfliteModel = null;
     }
 
     /** Reads label list from Assets. */
@@ -175,18 +184,18 @@ public class ImageClassifier {
                 imgData.putFloat((((val >> 16) & 0xFF)-IMAGE_MEAN)/IMAGE_STD);
                 imgData.putFloat((((val >> 8) & 0xFF)-IMAGE_MEAN)/IMAGE_STD);
                 imgData.putFloat((((val) & 0xFF)-IMAGE_MEAN)/IMAGE_STD);
-
             }
         }
         long endTime = SystemClock.uptimeMillis(); // end time
-        Log.d(TAG, "Timecost to put values into ByteBuffer: " + Long.toString(endTime - startTime));
+        Log.d( TAG, "🚀🚀🚀 Timecost to put values into ByteBuffer: " + Long.toString(endTime - startTime));
     }
 
     /** Prints top-K labels, to be shown in UI as the results. */
     private String printTopKLabels() {
         for (int i = 0; i < labelList.size(); ++i) {
             sortedLabels.add(
-                    // creating an AbstractMap so we get only the skeleton of the Map Interfece so it can be running faster than Map interface , SimpleEntry () we can build costom maps
+                    // creating an AbstractMap so we get only the skeleton of the Map Interfece so it can be running faster than Map interface ,
+                    // SimpleEntry () we can build custom maps
                     new AbstractMap.SimpleEntry<>(labelList.get(i), labelProbArray[0][i]));
             if (sortedLabels.size() > RESULTS_TO_SHOW) {
                 sortedLabels.poll();
@@ -197,9 +206,6 @@ public class ImageClassifier {
         for (int i = 0; i < size; ++i) {
             Map.Entry<String, Float> label = sortedLabels.poll();// we assing the sortedLabels Map to labels Map
             textToShow = String.format("\n%s: %4.2f" , label.getKey(),label.getValue()) + textToShow;
-
-            Log.d("head value" , label.getKey());
-            Log.d("head value" , label.getValue().toString());
         }
 
         return textToShow;

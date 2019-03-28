@@ -4,4 +4,14 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="camera_error">This device doesn\'t support Camera2 API.</string>
+    <string name="exampleDiseaseNames">
+        Apple scab : 0.00 "\n"
+        Apple_cedar_rust : 0.00"\n"
+        Apple_black_rot : 0.00
+    </string>
+    <string-array name="exampleDisease">
+        <item>Apple scab : 0.00</item>
+        <item>Apple_cedar_rust : 0.00</item>
+        <item>Apple_black_rot : 0.00</item>
+    </string-array>
 </resources>
