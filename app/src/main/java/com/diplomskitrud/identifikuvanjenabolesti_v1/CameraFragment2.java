@@ -200,7 +200,7 @@ public class CameraFragment2 extends Fragment  implements ActivityCompat.OnReque
 
         mTextureView = view.findViewById(R.id.textureView);
         mTextView = view.findViewById(R.id.predictionText);
-    }
+        }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
@@ -215,13 +215,13 @@ public class CameraFragment2 extends Fragment  implements ActivityCompat.OnReque
         startBackgroundThread();
     }
 
-    /** this method will be useful to check if the texture is avaliable when we start the app or when we resume and i though will be the best place to check**/
+    /** this method will be useful to check if the texture is available when we start the app or when we resume and i though will be the best place to check**/
     @Override
     public void onResume() {
         super.onResume();
         startBackgroundThread();
         if (mTextureView.isAvailable()) {
-            openCamera(mTextureView.getWidth(), mTextureView.getHeight());/* we are setuping it here like this cuz e know that the app has created it once here we resume**/
+            openCamera(mTextureView.getWidth(), mTextureView.getHeight());/* we are setting it here like this cuz e know that the app has created it once here we resume**/
         } else {
             mTextureView.setSurfaceTextureListener(mSurfaceListener);
         }
@@ -241,7 +241,7 @@ public class CameraFragment2 extends Fragment  implements ActivityCompat.OnReque
 
     private void setupCamera(int width, int height) {
 
-        Activity activity = getActivity();/** we are getting activity object as we are going to need it multiple time also we have to specify that in fragment we cant acces direct
+        Activity activity = getActivity();/** we are getting activity object as we are going to need it multiple time also we have to specify that in fragment we cant access direct
          the view cuz it is not type of View and we have to get it though activity**/
 
         CameraManager cameraManager = (CameraManager) activity.getSystemService(Context.CAMERA_SERVICE);
@@ -302,7 +302,6 @@ public class CameraFragment2 extends Fragment  implements ActivityCompat.OnReque
                     rotatedPreviewHeight = height;
                     rotatedPreviewWidth = displaySize.x;
                     rotatedPreviewHeight = displaySize.y;
-
                 }
 
                 if (maxPreviewWidth > MAX_PREVIEW_WIDTH) {
@@ -417,7 +416,7 @@ public class CameraFragment2 extends Fragment  implements ActivityCompat.OnReque
 
             //here we are creating a capture session for the camera preview
             mCameraDevice.createCaptureSession(
-                    Arrays.asList(previewSurface),
+                    Collections.singletonList(previewSurface), // changed this from Arrays.asList(previewSurface) cuz it did use more memory than the singletonList
                     new CameraCaptureSession.StateCallback() {
                         @Override
                         public void onConfigured(@NonNull CameraCaptureSession session) {
