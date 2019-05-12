@@ -73,7 +73,7 @@ public class ImageClassifier {
     /** Initializes an {@code ImageClassifier}. */
     ImageClassifier(Activity activity) throws IOException {
         tfliteModel = loadModelFile(activity);
-        tflite = new Interpreter(tfliteModel);
+        tflite = new Interpreter(tfliteModel, null);
         labelList = loadLabelList(activity);
         // allocate a to the variable or to a bytebuffer directly there is start and the limit or the capacity in the parameters
         imgData =
@@ -85,7 +85,7 @@ public class ImageClassifier {
         imgData.order(ByteOrder.nativeOrder());// retrieves this buffers byte order
         labelProbArray = new float[1][labelList.size()];
         filterLabelProbArray = new float[FILTER_STAGES][labelList.size()];//creating 2 arrays the one has the probability that has to filter later and the other labellist has all the list of labels
-        Log.d(TAG, "👌👌👌 Created a Tensorflow Lite Image Classifier.");
+        //Log.d(TAG, "👌👌👌 Created a Tensorflow Lite Image Classifier.");
     }
 
     /** Classifies a frame from the preview stream. */
@@ -101,7 +101,7 @@ public class ImageClassifier {
         tflite.run(imgData, labelProbArray);
 
         long endTime = SystemClock.uptimeMillis();
-        Log.d(TAG, "🍎🍎🍎 Time cost to run model inference(Prediction) ms: " + Long.toString(endTime - startTime));
+       // Log.d(TAG, "🍎🍎🍎 Time cost to run model inference(Prediction) ms: " + Long.toString(endTime - startTime));
 
         // smooth the results
         applyFilter();
@@ -143,7 +143,7 @@ public class ImageClassifier {
 
     /** Reads label list from Assets. */
     private List<String> loadLabelList(Activity activity) throws IOException {
-        List<String> labelList = new ArrayList<String>();
+        List<String> labelList = new ArrayList<>();
         BufferedReader reader =
                 new BufferedReader(new InputStreamReader(activity.getAssets().open(LABEL_PATH)));
         String line;
@@ -187,7 +187,7 @@ public class ImageClassifier {
             }
         }
         long endTime = SystemClock.uptimeMillis(); // end time
-        Log.d( TAG, "🚀🚀🚀 Timecost to put values into ByteBuffer: " + Long.toString(endTime - startTime));
+       // Log.d( TAG, "🚀🚀🚀 Timecost to put values into ByteBuffer: " + Long.toString(endTime - startTime));
     }
 
     /** Prints top-K labels, to be shown in UI as the results. */
