@@ -2,6 +2,9 @@ package com.diplomskitrud.identifikuvanjenabolesti_v1;
 
 import android.app.Activity;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.res.Configuration;
+import android.os.Build;
 import android.os.Bundle;
 
 
@@ -19,6 +22,4 @@ public class CameraActivity extends Activity {
                     .commit();
         }
     }
-
-
 }

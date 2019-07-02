@@ -47,6 +47,7 @@ import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -73,6 +74,7 @@ public class CameraFragment2 extends Fragment  implements ActivityCompat.OnReque
     private static final String CAMERA_PERMISSION = Manifest.permission.CAMERA;
     private static final int REQUEST_CODE = 0;
 
+    FrameLayout frameLayout;
 
     private AutoFitTextureView mTextureView;
     /** reference to the textureView the costom one that we created **/
@@ -200,6 +202,7 @@ public class CameraFragment2 extends Fragment  implements ActivityCompat.OnReque
 
         mTextureView = view.findViewById(R.id.textureView);
         mTextView = view.findViewById(R.id.predictionText);
+        frameLayout = view.findViewById(R.id.control);
         }
 
     @Override
@@ -229,9 +232,23 @@ public class CameraFragment2 extends Fragment  implements ActivityCompat.OnReque
 
     @Override
     public void onPause() {
-        closeCamera();
+        //closeCamera();
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            getActivity().enterPictureInPictureMode();
+        }
         stopBackgroundThread();
         super.onPause();
+    }
+    @Override
+    public void onPictureInPictureModeChanged(boolean isInPictureInPictureMode, Configuration newConfig) {
+        super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig);
+        if(isInPictureInPictureMode){
+            mTextView.setTextSize(8);
+        }else{
+            mTextView.setTextSize(18);
+
+        }
     }
 
     @Override
