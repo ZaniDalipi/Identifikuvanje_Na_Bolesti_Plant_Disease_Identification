@@ -85,6 +85,9 @@ public class CameraFragment2 extends Fragment  implements ActivityCompat.OnReque
     /** variable that will hold the id of the camera  **/
     private boolean checkedPermissions = false;
 
+    private boolean checkselfPermission = false;
+
+
     // we use this final lock object to synchronize classes that may interact with untrusted code
     private final Object lock = new Object();
     private boolean runClassifier = false;
