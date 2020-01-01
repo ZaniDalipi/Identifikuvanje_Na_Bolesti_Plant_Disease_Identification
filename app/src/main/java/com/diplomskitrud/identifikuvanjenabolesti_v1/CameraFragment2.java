@@ -63,6 +63,11 @@ import java.util.concurrent.TimeUnit;
 
 public class CameraFragment2 extends Fragment  implements ActivityCompat.OnRequestPermissionsResultCallback {
 
+
+    public static CameraFragment2 newInstance() {
+        return new CameraFragment2();
+    }
+
     //constants
     //private static final String FRAGMENT_DIALOG = "dialog";
     private static final String TAG = "PlanDiseaseApp";
@@ -84,7 +89,6 @@ public class CameraFragment2 extends Fragment  implements ActivityCompat.OnReque
     private String mCameraId;
     /** variable that will hold the id of the camera  **/
     private boolean checkedPermissions = false;
-    private boolean isCheckedPermissionss = true;
 
     // we use this final lock object to synchronize classes that may interact with untrusted code
     private final Object lock = new Object();
@@ -123,7 +127,7 @@ public class CameraFragment2 extends Fragment  implements ActivityCompat.OnReque
             mCameraOpenCloseLock.release();
             mCameraDevice = currentCamera;
             startPreview();
-          //  Toast.makeText(getActivity().getApplicationContext(), " camera succesfully connected  ", Toast.LENGTH_SHORT).show();
+            //  Toast.makeText(getActivity().getApplicationContext(), " camera succesfully connected  ", Toast.LENGTH_SHORT).show();
         }
 
         @Override
@@ -168,7 +172,7 @@ public class CameraFragment2 extends Fragment  implements ActivityCompat.OnReque
 
                 @Override
                 public void onCaptureCompleted(@NonNull CameraCaptureSession session,
-                                              @NonNull CaptureRequest request,
+                                               @NonNull CaptureRequest request,
                                                @NonNull TotalCaptureResult result) {
                 }
             };
@@ -183,11 +187,6 @@ public class CameraFragment2 extends Fragment  implements ActivityCompat.OnReque
             activity.runOnUiThread(
                     () -> mTextView.setText(text));
         }
-    }
-
-
-    public static CameraFragment2 newInstance() {
-        return new CameraFragment2();
     }
 
     @Nullable
@@ -214,7 +213,7 @@ public class CameraFragment2 extends Fragment  implements ActivityCompat.OnReque
             imageClassifier = new ImageClassifier(getActivity());
             Toast.makeText(getActivity() , "Model and labels has been loaded " , Toast.LENGTH_LONG).show();
         }catch (IOException e){
-            Log.e(TAG, "Failed to initialize an image classifier.");
+            Log.e(TAG, "failed to initialize an image classfier");
         }
         startBackgroundThread();
     }
@@ -328,6 +327,7 @@ public class CameraFragment2 extends Fragment  implements ActivityCompat.OnReque
                 if (maxPreviewHeight > MAX_PREVIEW_HEIGHT) {
                     maxPreviewHeight = MAX_PREVIEW_HEIGHT;
                 }
+
                 previewSize =
                         chooseOptimalSize(
                                 map.getOutputSizes(SurfaceTexture.class),// getting the preview sizes and pass to surface class
@@ -600,7 +600,7 @@ public class CameraFragment2 extends Fragment  implements ActivityCompat.OnReque
                 }
             }
         }
-        //pick the smalles of those that are in the list of bigEnough variables , if there is no bigenough pick the largest of those that are in notBigEnough array
+        //pick the smallest of those that are in the list of bigEnough variables , if there is no bigenough pick the largest of those that are in notBigEnough array
         if(bigEnough.size() > 0){
             return Collections.min(bigEnough , new CompareSizeByArea());// get the most suitable res that mean it will be close to the device resolution or the same from the list and create new instance of comareSizeArea object
         }else if (notBigEnogh.size() > 0){
